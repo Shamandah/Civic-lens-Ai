@@ -64,6 +64,7 @@ class CitizenFeedback(models.Model):
 
     ai_summary = models.TextField(blank=True)
     recommendation = models.TextField(blank=True)
+    action_plan = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
 

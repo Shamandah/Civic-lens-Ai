@@ -4,7 +4,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .services.gemma import analyze_feedback
-from .models import Ward, Category, CitizenFeedback,Department
+from .models import Ward, Category, CitizenFeedback, Department
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (
     WardSerializer,
     CategorySerializer,
@@ -25,9 +26,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
 
 class CitizenFeedbackViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
     queryset = CitizenFeedback.objects.all().order_by("-created_at")
     serializer_class = CitizenFeedbackSerializer
+
+
 class AnalyzeFeedbackView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
 
@@ -45,17 +50,18 @@ class AnalyzeFeedbackView(APIView):
             name=ai["category"]
         )
         department, _ = Department.objects.get_or_create(
-    name=ai["department"]
-    )
+            name=ai["department"]
+        )
         feedback = CitizenFeedback.objects.create(
             citizen_name=data.get("citizen_name", ""),
             ward=ward,
             feedback_text=data["feedback_text"],
             category=category,
-            department=department,
             priority=ai["priority"],
             ai_summary=ai["summary"],
             recommendation=ai["recommendation"],
+            department=department,
+            action_plan="\n".join(ai["action_plan"]),
         )
 
         return Response(
@@ -63,6 +69,7 @@ class AnalyzeFeedbackView(APIView):
             status=status.HTTP_201_CREATED,
         )
 class DashboardView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
 
@@ -73,60 +80,55 @@ class DashboardView(APIView):
         low_priority = CitizenFeedback.objects.filter(priority="Low").count()
 
         categories = [
-    {
-        "name": item["category__name"],
-        "count": item["total"]
-    }
-    for item in (
-        CitizenFeedback.objects
-        .values("category__name")
-        .annotate(total=Count("id"))
-        .order_by("-total")
-    )
-]
+            {
+                "name": item["category__name"],
+                "count": item["total"]
+            }
+            for item in (
+                CitizenFeedback.objects
+                .values("category__name")
+                .annotate(total=Count("id"))
+                .order_by("-total")
+            )
+        ]
         wards = [
-                    {
-                        "name": item["ward__name"],
-                        "count": item["total"]
-                    }
-                    for item in (
-                        CitizenFeedback.objects
-                        .values("ward__name")
-                        .annotate(total=Count("id"))
-                        .order_by("-total")
-                    )
-                ]
+            {
+                "name": item["ward__name"],
+                "count": item["total"]
+            }
+            for item in (
+                CitizenFeedback.objects
+                .values("ward__name")
+                .annotate(total=Count("id"))
+                .order_by("-total")
+            )
+        ]
+        departments = [
+            {
+                "name": item["department__name"],
+                "count": item["total"]
+            }
+            for item in (
+                CitizenFeedback.objects
+                .values("department__name")
+                .annotate(total=Count("id"))
+                .order_by("-total")
+            )
+        ]
 
         return Response({
-                    "total_feedback": total_feedback,
-                    "high_priority": high_priority,
-                    "medium_priority": medium_priority,
-                    "low_priority": low_priority,
-                    "categories": categories,
-                    "wards": wards,
-                })
-        departments = [
-    {
-        "name": item["department__name"],
-        "count": item["total"]
-    }
-    for item in (
-        CitizenFeedback.objects
-        .values("department__name")
-        .annotate(total=Count("id"))
-        .order_by("-total")
-    )
-]
-        return Response({
-    "total_feedback": total_feedback,
-    "high_priority": high_priority,
-    "medium_priority": medium_priority,
-    "low_priority": low_priority,
-    "categories": categories,
-    "wards": wards,
-    "departments": departments,
-})
+            "total_feedback": total_feedback,
+            "high_priority": high_priority,
+            "medium_priority": medium_priority,
+            "low_priority": low_priority,
+            "categories": categories,
+            "wards": wards,
+            "departments": departments,
+        })
+
+
 class RecentFeedbackView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         feedback = (

@@ -1,9 +1,18 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../assets/kenya.png";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    navigate("/login");
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-7xl mx-auto h-20 px-6 flex items-center justify-between">
 
         {/* Brand */}
@@ -26,16 +35,14 @@ function Navbar() {
         </div>
 
         {/* Navigation */}
-        <nav className="flex gap-8">
+        <nav className="flex items-center gap-8">
 
           <NavLink
-            to="/"
+            to="/dashboard"
             className={({ isActive }) =>
-              `font-medium transition ${
-                isActive
-                  ? "text-blue-700"
-                  : "text-gray-600 hover:text-blue-700"
-              }`
+              isActive
+                ? "font-semibold text-blue-700"
+                : "font-medium text-gray-600 hover:text-blue-700 transition"
             }
           >
             Dashboard
@@ -44,15 +51,20 @@ function Navbar() {
           <NavLink
             to="/submit"
             className={({ isActive }) =>
-              `font-medium transition ${
-                isActive
-                  ? "text-blue-700"
-                  : "text-gray-600 hover:text-blue-700"
-              }`
+              isActive
+                ? "font-semibold text-blue-700"
+                : "font-medium text-gray-600 hover:text-blue-700 transition"
             }
           >
             Submit Report
           </NavLink>
+
+          <button
+            onClick={handleLogout}
+            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
+          >
+            Logout
+          </button>
 
         </nav>
 

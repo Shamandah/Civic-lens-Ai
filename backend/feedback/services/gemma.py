@@ -15,14 +15,14 @@ MODELS = [
     "gemini-2.0-flash",
 ]
 DEPARTMENT_MAPPING = {
-    "Healthcare": "Health Services",
-    "Water": "Water & Sanitation",
-    "Roads": "Roads & Transport",
-    "Education": "Education",
-    "Security": "Public Safety & Inspectorate",
-    "Environment": "Environment & Waste Management",
-    "Agriculture": "Agriculture",
-    "Other": "Public Works",
+    "Healthcare": "Department of Health Services",
+    "Water": "Department of Water & Sanitation",
+    "Roads": "Department of Roads & Public Works",
+    "Education": "Department of Education",
+    "Security": "Department of Public Safety",
+    "Environment": "Department of Environment & Natural Resources",
+    "Agriculture": "Department of Agriculture",
+    "Other": "Department of Public Works",
 }
 def analyze_feedback(feedback_text):
     prompt = f"""
@@ -53,16 +53,35 @@ Priority must be exactly one of:
 - High
 
 Generate:
+
 - A short summary (maximum 30 words)
-- One practical recommendation that a county government or MP can act on.
 
-Return ONLY this JSON:
+- One practical recommendation.
 
+- Choose exactly ONE responsible department from this list:
+
+• Department of Roads & Public Works
+• Department of Health Services
+• Department of Water & Sanitation
+• Department of Education
+• Department of Agriculture
+• Department of Environment & Natural Resources
+• Department of Public Safety
+• Other
+
+- Generate exactly THREE short action steps the department should take.
+RETURN ONLY valid JSON in this format:
 {{
     "category": "",
     "priority": "",
     "summary": "",
-    "recommendation": ""
+    "recommendation": "",
+    "department": "",
+    "action_plan": [
+        "",
+        "",
+        ""
+    ]
 }}
 """
 
