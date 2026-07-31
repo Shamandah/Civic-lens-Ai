@@ -1,9 +1,8 @@
 import axios from "axios";
 
-const api = axios.create({
-    baseURL: "http://127.0.0.1:8000/api/",
+const API = axios.create({
+    baseURL: "https://civic-lens-ai-1.onrender.com/api/",
 });
-
 // Automatically attach JWT token
 api.interceptors.request.use(
     (config) => {
