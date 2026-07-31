@@ -30,7 +30,11 @@ SECRET_KEY = 'django-insecure--*&-q&^xh7l^8b@hs*vcad$&b0a304-b**9se+4@eb^(9p3^o!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "civic-lens-ai-1.onrender.com",
+]
 
 
 # Application definition
