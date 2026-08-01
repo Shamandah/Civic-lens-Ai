@@ -10,7 +10,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         {/* Redirect root to citizen form */}
-        <Route path="/" element={<Navigate to="/submit" replace />} />
+        <Route path="/" element={<Navigate to="login" replace />} />
 
         {/* Public Routes */}
         <Route path="/submit" element={<SubmitFeedback />} />
